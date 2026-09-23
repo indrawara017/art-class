@@ -8,11 +8,22 @@
     "scheme": "artclass",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/logo.jpeg"
+      "icon": "./assets/logo.jpeg",
+      "bundleIdentifier": "com.zaraazalia.artclass",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "icon": "./assets/logo.jpeg",
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.zaraazalia.artclass",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
     },
     "web": {
       "output": "static",
