@@ -8,6 +8,7 @@ import { TypewriterText } from '../components/TypewriterText';
 import { Typography } from '../components/Typography';
 import { Colors } from '../theme/colors';
 import { audioManager } from '../utils/AudioManager';
+import { getCurrentUser } from '../utils/supabase';
 import { Slide4_Quiz } from './Slide4_Quiz';
 
 const VIDEO_LIST = [
@@ -243,7 +244,18 @@ export function Slide3_Menu({ onQuizActiveChange }: Slide3Props = {}) {
                           <PixelButton
                             backgroundColor={Colors.blue}
                             style={styles.actionBtn}
-                            onPress={() => {
+                            onPress={async () => {
+                              const user = await getCurrentUser();
+                              if (!user) {
+                                Alert.alert('Perhatian', 'Kamu harus masuk (login) terlebih dahulu dari Ruang Karya sebelum bisa mengikuti kuis.');
+                                router.push('/gallery');
+                                return;
+                              }
+                              if (!user.avatar_url) {
+                                Alert.alert('Perhatian', 'Kamu wajib mengatur foto profil di Ruang Karya terlebih dahulu sebelum bisa mengikuti kuis.');
+                                router.push('/gallery');
+                                return;
+                              }
                               setActiveDetail(null);
                               audioManager.playQuizStart();
                               setTimeout(() => { setIsQuizActive(true); }, 300);

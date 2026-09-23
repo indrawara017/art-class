@@ -395,6 +395,9 @@ export default function GalleryScreen() {
                     if (!currentUser) {
                       setAuthMode('login');
                       setShowAuthModal(true);
+                    } else if (!currentUser.avatar_url) {
+                      Alert.alert('Perhatian', 'Kamu wajib mengunggah foto profil terlebih dahulu sebelum bisa membagikan karya.');
+                      setShowProfileModal(true);
                     } else {
                       setShowUploadModal(true);
                     }
