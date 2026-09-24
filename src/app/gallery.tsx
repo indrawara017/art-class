@@ -11,6 +11,7 @@ import {
   useWindowDimensions,
   ActivityIndicator,
   Image,
+  BackHandler,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -100,6 +101,17 @@ export default function GalleryScreen() {
     loadArtworksData();
     loadLeaderboardData();
   }, [loadUser, loadArtworksData, loadLeaderboardData]);
+
+  // Handle back button / hardware back navigation to Slide 2
+  useEffect(() => {
+    const handleBack = () => {
+      router.replace({ pathname: '/', params: { slide: '2' } });
+      return true;
+    };
+
+    const backSubscription = BackHandler.addEventListener('hardwareBackPress', handleBack);
+    return () => backSubscription.remove();
+  }, []);
 
   // Auth Handlers
   const handleAuthSubmit = async () => {
@@ -297,7 +309,13 @@ export default function GalleryScreen() {
     <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 12) }]}>
       {/* TOP HEADER */}
       <View style={[styles.topHeader, { paddingTop: Math.max(insets.top, 10) }]}>
-        <PixelButton backgroundColor={Colors.orange} style={styles.backBtn} onPress={() => router.replace('/')}>
+        <PixelButton 
+          backgroundColor={Colors.orange} 
+          style={styles.backBtn} 
+          onPress={() => {
+            router.replace({ pathname: '/', params: { slide: '2' } });
+          }}
+        >
           <Typography variant="pixel" style={styles.backBtnText}>◀ KELAS</Typography>
         </PixelButton>
 

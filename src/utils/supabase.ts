@@ -367,10 +367,10 @@ export const saveQuizResult = async (score: number, passed: boolean): Promise<{ 
   const userId = user?.id || 'guest_' + Date.now();
 
   try {
-    if (isSupabaseConfigured() && user) {
+    if (isSupabaseConfigured()) {
       const { error } = await supabase.from('quiz_results').insert([
         {
-          user_id: user.id,
+          user_id: userId,
           author_name: authorName,
           score,
           passed,

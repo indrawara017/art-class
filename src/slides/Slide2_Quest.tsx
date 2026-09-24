@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, ScrollView, useWindowDimensions, TouchableOpacity } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { router } from 'expo-router';
 import { Typography } from '../components/Typography';
 import { PixelCard } from '../components/PixelCard';
 import { Colors } from '../theme/colors';
@@ -35,18 +36,42 @@ export function Slide2_Quest() {
         </Animated.View>
 
         <View style={[styles.questGrid, isMobile && styles.questGridMobile]}>
-          {questItems.map((item, index) => (
-            <Animated.View 
-              key={item.num} 
-              entering={FadeInUp.delay(index * 100).duration(500)}
-              style={styles.cardWrapper}
-            >
+          {questItems.map((item, index) => {
+            const isGallery = item.num === 5;
+            const cardContent = (
               <PixelCard backgroundColor={item.color} style={isMobile ? styles.questCardMobile : styles.questCard}>
                 <Typography style={isMobile ? styles.iconMobile : styles.icon}>{item.icon}</Typography>
                 <Typography weight="bold" style={isMobile ? styles.questTextMobile : styles.questText}>{item.text}</Typography>
+                {isGallery && (
+                  <Typography variant="pixel" style={styles.galleryBadge}>
+                    ▶ BUKA GALERI
+                  </Typography>
+                )}
               </PixelCard>
-            </Animated.View>
-          ))}
+            );
+
+            return (
+              <Animated.View 
+                key={item.num} 
+                entering={FadeInUp.delay(index * 100).duration(500)}
+                style={styles.cardWrapper}
+              >
+                {isGallery ? (
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    onPress={() => {
+                      router.push('/gallery');
+                    }}
+                    style={{ width: '100%', height: '100%' }}
+                  >
+                    {cardContent}
+                  </TouchableOpacity>
+                ) : (
+                  cardContent
+                )}
+              </Animated.View>
+            );
+          })}
         </View>
       </View>
     </ScrollView>
@@ -137,5 +162,16 @@ const styles = StyleSheet.create({
   questTextMobile: {
     fontSize: 14,
     marginTop: 12,
+  },
+  galleryBadge: {
+    fontSize: 9,
+    marginTop: 10,
+    backgroundColor: Colors.white,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    color: Colors.ink,
+    borderWidth: 2,
+    borderColor: Colors.ink,
   }
 });

@@ -20,6 +20,13 @@ const VIDEO_LIST = [
     desc: 'Pengantar memahami hakikat seni, makna keindahan, dan ekspresi visual.'
   },
   {
+    id: 'lukisan',
+    title: 'Lukisan',
+    url: 'https://youtu.be/1fTr9f7a9lE?si=ydzxORel5kohpKkq',
+    icon: '🖌️',
+    desc: 'Pengertian, tujuan berkarya, dan teknik ekspresi visual dalam seni lukis.'
+  },
+  {
     id: 'ilustrasi',
     title: 'Ilustrasi',
     url: 'https://youtu.be/g-9IITcX9FM?si=cL9jEpvfhpWkK-Vv',
@@ -100,8 +107,8 @@ export function Slide3_Menu({ onQuizActiveChange }: Slide3Props = {}) {
     },
     {
       id: 'video', icon: '🎬', title: 'Video', color: '#ff887c',
-      copy: 'Tonton 4 video seni: Seni, Ilustrasi, Poster, & Fotografi.',
-      detail: 'Tonton video pembelajaran seni rupa: Apa Itu Seni, Ilustrasi, Poster, dan Fotografi untuk memperkaya wawasan serta teknik berkaryamu.'
+      copy: 'Tonton 5 video seni: Seni, Lukisan, Ilustrasi, Poster, & Fotografi.',
+      detail: 'Tonton video pembelajaran seni rupa: Apa Itu Seni, Lukisan, Ilustrasi, Poster, dan Fotografi untuk memperkaya wawasan serta teknik berkaryamu.'
     },
     {
       id: 'inspirasi', icon: '✨', title: 'Inspirasi', color: Colors.purple,

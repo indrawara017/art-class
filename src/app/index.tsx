@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { useLocalSearchParams } from 'expo-router';
 import { Header } from '../components/Header';
 import { PixelButton } from '../components/PixelButton';
 import { Typography } from '../components/Typography';
@@ -13,10 +14,31 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function AppIndex() {
   const insets = useSafeAreaInsets();
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isQuizActive, setIsQuizActive] = useState(false);
+  const params = useLocalSearchParams<{ slide?: string }>();
   const totalSlides = 3; 
+
+  const getInitialSlide = () => {
+    if (params.slide) {
+      const parsed = parseInt(params.slide, 10);
+      if (!isNaN(parsed) && parsed >= 0 && parsed <= totalSlides) {
+        return parsed;
+      }
+    }
+    return 0;
+  };
+
+  const [currentSlide, setCurrentSlide] = useState<number>(getInitialSlide);
+  const [isQuizActive, setIsQuizActive] = useState(false);
   const points = currentSlide * 10; // Mock logic for points
+
+  useEffect(() => {
+    if (params.slide !== undefined) {
+      const parsed = parseInt(params.slide, 10);
+      if (!isNaN(parsed) && parsed >= 0 && parsed <= totalSlides) {
+        setCurrentSlide(parsed);
+      }
+    }
+  }, [params.slide]);
 
   const handleHomePress = () => setCurrentSlide(0);
   
