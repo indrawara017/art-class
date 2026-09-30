@@ -1,7 +1,7 @@
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert, Linking, Modal, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
-import { router } from 'expo-router';
 import { PixelButton } from '../components/PixelButton';
 import { PixelCard } from '../components/PixelCard';
 import { TypewriterText } from '../components/TypewriterText';
@@ -49,81 +49,81 @@ const VIDEO_LIST = [
   }
 ];
 
-const MATERI_LIST = [
+const KAHOOT_LIST = [
   {
-    id: 'unsur-seni',
-    title: 'Elemen Dasar Seni Rupa',
-    url: 'https://id.wikipedia.org/wiki/Unsur_seni_rupa',
-    icon: '📐',
-    desc: 'Pahami konsep titik, garis, bidang, bentuk, ruang, warna, dan tekstur.'
-  },
-  {
-    id: 'teori-warna',
-    title: 'Panduan Teori Warna',
-    url: 'https://id.wikipedia.org/wiki/Teori_warna',
-    icon: '🎨',
-    desc: 'Pengenalan roda warna, warna primer, sekunder, dan harmoni warna.'
-  },
-  {
-    id: 'prinsip-desain',
-    title: 'Prinsip Desain & Komposisi',
-    url: 'https://id.wikipedia.org/wiki/Desain_komunikasi_visual',
-    icon: '⚖️',
-    desc: 'Keseimbangan, proporsi, ritme, dan penekanan dalam merancang karya seni.'
-  },
-  {
-    id: 'alat-bahan',
-    title: 'Alat & Bahan Berkarya',
-    url: 'https://id.wikipedia.org/wiki/Alat_lukis',
+    id: 'kahoot-lukisan',
+    title: 'Kahoot: Lukisan',
+    url: 'https://kahoot.it/challenge/08882705?challenge-id=cb8496ca-b1cf-4cad-b19e-0ba7dd82b05f_1790772591864',
     icon: '🖌️',
-    desc: 'Mengenal berbagai media seni rupa dari pensil, cat air, hingga kanvas.'
+    desc: 'Uji pemahamanmu tentang seni lukis, teknik, dan mediumnya.'
+  },
+  {
+    id: 'kahoot-ilustrasi',
+    title: 'Kahoot: Ilustrasi',
+    url: 'https://kahoot.it/challenge/08139621?challenge-id=cb8496ca-b1cf-4cad-b19e-0ba7dd82b05f_1790771574315',
+    icon: '✏️',
+    desc: 'Kuis seputar seni gambar ilustrasi dan teknik bercerita visual.'
+  },
+  {
+    id: 'kahoot-poster',
+    title: 'Kahoot: Poster',
+    url: 'https://kahoot.it/challenge/05056744?challenge-id=cb8496ca-b1cf-4cad-b19e-0ba7dd82b05f_1790770681069',
+    icon: '📢',
+    desc: 'Tantangan tentang desain grafis, tipografi, dan komposisi poster.'
+  },
+  {
+    id: 'kahoot-fotografi',
+    title: 'Kahoot: Fotografi',
+    url: 'https://kahoot.it/challenge/01499792?challenge-id=cb8496ca-b1cf-4cad-b19e-0ba7dd82b05f_1790771235795',
+    icon: '📸',
+    desc: 'Buktikan kemampuanmu tentang teknik pencahayaan dan komposisi foto.'
   }
 ];
 
+
 interface Slide3Props {
+  isQuizActive?: boolean;
   onQuizActiveChange?: (isActive: boolean) => void;
+  onQuizScoreChange?: (score: number) => void;
 }
 
-export function Slide3_Menu({ onQuizActiveChange }: Slide3Props = {}) {
+export function Slide3_Menu({ isQuizActive = false, onQuizActiveChange, onQuizScoreChange }: Slide3Props = {}) {
   const [activeDetail, setActiveDetail] = useState<string | null>(null);
-  const [isQuizActive, setIsQuizActive] = useState(false);
 
-  useEffect(() => {
-    if (onQuizActiveChange) onQuizActiveChange(isQuizActive);
-  }, [isQuizActive]);
+
   const { width } = useWindowDimensions();
   const isMobile = width < 600;
 
   const menuItems = [
-    {
-      id: 'materi', icon: '📚', title: 'Materi', color: Colors.gold,
-      copy: 'Pahami konsep dasar seni dan elemen visual.',
-      detail: 'Materi minggu ini membahas elemen visual dasar: Garis, Bentuk, Warna, dan Tekstur. Memahami cara mengombinasikan elemen-elemen ini adalah langkah pertama untuk menyampaikan pesan melalui karya senimu.'
-    },
-    {
-      id: 'karya', icon: '🖼️', title: 'Karya', color: Colors.orange,
-      copy: 'Pamerkan karyamu & lihat karya teman sekelas!',
-      detail: 'Masuk ke Ruang Karya Komunal! Unggah hasil sketsa, lukisan, atau karyamu beserta catatan proses kreatif, dan nikmati karya inspiratif dari teman-teman sekelasmu.'
-    },
     {
       id: 'video', icon: '🎬', title: 'Video', color: '#ff887c',
       copy: 'Tonton 5 video seni: Seni, Lukisan, Ilustrasi, Poster, & Fotografi.',
       detail: 'Tonton video pembelajaran seni rupa: Apa Itu Seni, Lukisan, Ilustrasi, Poster, dan Fotografi untuk memperkaya wawasan serta teknik berkaryamu.'
     },
     {
-      id: 'inspirasi', icon: '✨', title: 'Inspirasi', color: Colors.purple,
-      copy: 'Temukan inspirasi dari lingkungan sekitarmu.',
-      detail: 'Butuh inspirasi? Cobalah berjalan-jalan ke luar selama 15 menit. Kumpulkan 3 helai daun dengan bentuk yang berbeda, lalu cobalah menggabungkan polanya menjadi sebuah monster yang unik!'
+      id: 'kahoot', icon: '📱', title: 'Kahoot Quiz', color: Colors.purple,
+      copy: 'Mainkan kuis Kahoot seru bersama teman sekelasmu!',
+      detail: 'Uji pengetahuanmu dengan cara yang menyenangkan melalui Kahoot! Bersainglah untuk mendapatkan posisi teratas secara langsung.'
     },
     {
       id: 'quiz', icon: '🧩', title: 'Art Quiz', color: Colors.green,
       copy: 'Uji pengetahuan senimu dan raih skor sempurna!',
       detail: 'Siap menghadapi tantangan terakhir? Buktikan pemahamanmu tentang teori warna, unsur dasar, dan teknik seni rupa melalui kuis interaktif ini. Hanya seniman sejati yang mampu meraih nilai 100!'
     },
+    {
+      id: 'gallery', icon: '🖼️', title: 'Galery', color: Colors.orange,
+      copy: 'Pamerkan karyamu & lihat karya teman sekelas!',
+      detail: 'Masuk ke Ruang Karya Komunal! Unggah hasil sketsa, lukisan, atau karyamu beserta catatan proses kreatif, dan nikmati karya inspiratif dari teman-teman sekelasmu.'
+    },
+    {
+      id: 'leaderboard', icon: '🏆', title: 'Leaderboard Art Quizz', color: Colors.gold,
+      copy: 'Lihat peringkat tertinggi dari skor Art Quiz!',
+      detail: 'Pantau posisi klasemen sementara! Pemain dengan skor tertinggi dan waktu tercepat akan menduduki puncak Leaderboard Art Quiz.'
+    },
   ];
 
   if (isQuizActive) {
-    return <Slide4_Quiz onFinish={(score) => setIsQuizActive(false)} />;
+    return <Slide4_Quiz onFinish={(score) => onQuizActiveChange?.(false)} onScoreChange={onQuizScoreChange} />;
   }
 
   return (
@@ -180,19 +180,19 @@ export function Slide3_Menu({ onQuizActiveChange }: Slide3Props = {}) {
             <Animated.View entering={FadeInDown.duration(300)} style={styles.modalContent}>
               <PixelCard backgroundColor={Colors.white} style={isMobile ? styles.bannerMobile : undefined}>
                 <Typography variant="pixel" color={Colors.blue} style={isMobile ? styles.detailTitleMobile : styles.detailTitle}>
-                  {activeDetail === 'video' ? 'VIDEO PEMBELAJARAN SENI' : activeDetail === 'materi' ? 'MATERI PEMBELAJARAN' : menuItems.find(i => i.id === activeDetail)?.title.toUpperCase()}
+                  {activeDetail === 'video' ? 'VIDEO PEMBELAJARAN SENI' : activeDetail === 'kahoot' ? 'KAHOOT QUIZ SENI' : menuItems.find(i => i.id === activeDetail)?.title.toUpperCase()}
                 </Typography>
 
-                {activeDetail === 'video' || activeDetail === 'materi' ? (
+                {activeDetail === 'video' || activeDetail === 'kahoot' ? (
                   <View style={styles.videoSection}>
                     <Typography style={isMobile ? styles.detailCopyMobile : styles.detailCopy}>
-                      {activeDetail === 'video' 
-                        ? 'Pilih video pembelajaran di bawah ini untuk ditonton langsung di YouTube:' 
-                        : 'Pilih materi bacaan di bawah ini untuk mempelajari lebih dalam:'}
+                      {activeDetail === 'video'
+                        ? 'Pilih video pembelajaran di bawah ini untuk ditonton langsung di YouTube:'
+                        : 'Pilih kuis Kahoot di bawah ini untuk memainkannya secara langsung:'}
                     </Typography>
 
                     <ScrollView style={styles.videoScrollList} showsVerticalScrollIndicator={false}>
-                      {(activeDetail === 'video' ? VIDEO_LIST : MATERI_LIST).map((item) => (
+                      {(activeDetail === 'video' ? VIDEO_LIST : KAHOOT_LIST).map((item) => (
                         <View key={item.id} style={styles.videoCardWrapper}>
                           <PixelCard backgroundColor={Colors.cream} style={styles.videoCard}>
                             <View style={styles.videoHeaderRow}>
@@ -203,14 +203,14 @@ export function Slide3_Menu({ onQuizActiveChange }: Slide3Props = {}) {
                               </View>
                             </View>
                             <PixelButton
-                              backgroundColor={activeDetail === 'video' ? Colors.red : Colors.blue}
+                              backgroundColor={activeDetail === 'video' ? Colors.red : Colors.purple}
                               style={styles.watchBtn}
                               onPress={() => {
                                 Linking.openURL(item.url);
                               }}
                             >
                               <Typography style={styles.watchBtnText}>
-                                {activeDetail === 'video' ? '▶ TONTON DI YOUTUBE' : '📖 BACA MATERI'}
+                                {activeDetail === 'video' ? '▶ TONTON DI YOUTUBE' : '📱 BUKA KAHOOT'}
                               </Typography>
                             </PixelButton>
                           </PixelCard>
@@ -235,7 +235,7 @@ export function Slide3_Menu({ onQuizActiveChange }: Slide3Props = {}) {
                       style={isMobile ? styles.detailCopyMobile : styles.detailCopy}
                     />
                     <View style={styles.detailActionRow}>
-                      {activeDetail === 'karya' ? (
+                      {activeDetail === 'gallery' ? (
                         <PixelButton
                           backgroundColor={Colors.green}
                           style={styles.actionBtn}
@@ -246,41 +246,40 @@ export function Slide3_Menu({ onQuizActiveChange }: Slide3Props = {}) {
                         >
                           <Typography style={styles.actionBtnText}>🎨 BUKA RUANG KARYA</Typography>
                         </PixelButton>
+                      ) : activeDetail === 'leaderboard' ? (
+                        <PixelButton
+                          backgroundColor={Colors.gold}
+                          style={styles.actionBtn}
+                          onPress={() => {
+                            setActiveDetail(null);
+                            router.push('/leaderboard');
+                          }}
+                        >
+                          <Typography style={[styles.actionBtnText, { color: Colors.ink }]}>🏆 SKOR KELAS</Typography>
+                        </PixelButton>
                       ) : activeDetail === 'quiz' ? (
-                        <>
-                          <PixelButton
-                            backgroundColor={Colors.blue}
-                            style={styles.actionBtn}
-                            onPress={async () => {
-                              const user = await getCurrentUser();
-                              if (!user) {
-                                Alert.alert('Perhatian', 'Kamu harus masuk (login) terlebih dahulu dari Ruang Karya sebelum bisa mengikuti kuis.');
-                                router.push('/gallery');
-                                return;
-                              }
-                              if (!user.avatar_url) {
-                                Alert.alert('Perhatian', 'Kamu wajib mengatur foto profil di Ruang Karya terlebih dahulu sebelum bisa mengikuti kuis.');
-                                router.push('/gallery');
-                                return;
-                              }
-                              setActiveDetail(null);
-                              audioManager.playQuizStart();
-                              setTimeout(() => { setIsQuizActive(true); }, 300);
-                            }}
-                          >
-                            <Typography style={styles.actionBtnText}>▶ MULAI KUIS</Typography>
-                          </PixelButton>
-                          <PixelButton
-                            backgroundColor={Colors.gold}
-                            style={styles.actionBtn}
-                            onPress={() => {
-                              setActiveDetail(null);
-                              router.push('/gallery');
-                            }}
-                          >
-                            <Typography style={[styles.actionBtnText, { color: Colors.ink }]}>🏆 SKOR KELAS</Typography>
-                          </PixelButton>
-                        </>
+                        <PixelButton
+                          backgroundColor={Colors.blue}
+                          style={styles.actionBtn}
+                          onPress={async () => {
+                            const user = await getCurrentUser();
+                            if (!user) {
+                              Alert.alert('Perhatian', 'Kamu harus masuk (login) terlebih dahulu sebelum bisa mengikuti kuis.');
+                              router.push('/?slide=2');
+                              return;
+                            }
+                            if (!user.avatar_url) {
+                              Alert.alert('Perhatian', 'Kamu wajib mengatur foto profil terlebih dahulu sebelum bisa mengikuti kuis.');
+                              router.push('/?slide=2');
+                              return;
+                            }
+                            setActiveDetail(null);
+                            audioManager.playQuizStart();
+                            setTimeout(() => { onQuizActiveChange?.(true); }, 300);
+                          }}
+                        >
+                          <Typography style={styles.actionBtnText}>▶ MULAI KUIS</Typography>
+                        </PixelButton>
                       ) : (
                         <PixelButton
                           backgroundColor={Colors.blue}

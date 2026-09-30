@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { Header } from '../components/Header';
 import { PixelButton } from '../components/PixelButton';
 import { Typography } from '../components/Typography';
@@ -11,6 +11,7 @@ import { Slide2_Quest } from '../slides/Slide2_Quest';
 import { Slide3_Menu } from '../slides/Slide3_Menu';
 import { Colors } from '../theme/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getCurrentUser, getLeaderboard, getArtworks } from '../utils/supabase';
 
 export default function AppIndex() {
   const insets = useSafeAreaInsets();
@@ -29,18 +30,46 @@ export default function AppIndex() {
 
   const [currentSlide, setCurrentSlide] = useState<number>(getInitialSlide);
   const [isQuizActive, setIsQuizActive] = useState(false);
-  const points = currentSlide * 10; // Mock logic for points
+  const [points, setPoints] = useState(0);
+  const [liveScore, setLiveScore] = useState(0);
 
   useEffect(() => {
     if (params.slide !== undefined) {
       const parsed = parseInt(params.slide, 10);
       if (!isNaN(parsed) && parsed >= 0 && parsed <= totalSlides) {
         setCurrentSlide(parsed);
+        setIsQuizActive(false); 
+        setLiveScore(0);
       }
     }
   }, [params.slide]);
 
-  const handleHomePress = () => setCurrentSlide(0);
+  useFocusEffect(
+    React.useCallback(() => {
+      const fetchScore = async () => {
+        const user = await getCurrentUser();
+        if (user) {
+          const artworks = await getArtworks();
+          const userArtworks = artworks.filter(a => a.user_id === user.id);
+          const artworkPoints = userArtworks.length * 50;
+
+          setPoints(artworkPoints);
+        }
+      };
+      fetchScore();
+    }, [])
+  );
+
+  const handleHomePress = () => {
+    if (isQuizActive) {
+      setIsQuizActive(false);
+      setLiveScore(0);
+      return;
+    }
+    setCurrentSlide(0);
+    setIsQuizActive(false);
+    setLiveScore(0);
+  };
   
   // A simple way to progress linearly for testing, or we can just leave it as handled by the slides.
   // We'll let slide 0 transition to slide 1
@@ -50,11 +79,19 @@ export default function AppIndex() {
   // For now, let's just create a next/prev button overlay if we are past slide 0
   
   const handleNext = () => {
-    if (currentSlide < totalSlides) setCurrentSlide(currentSlide + 1);
+    if (currentSlide < totalSlides) {
+      setCurrentSlide(currentSlide + 1);
+      setIsQuizActive(false);
+      setLiveScore(0);
+    }
   };
   
   const handlePrev = () => {
-    if (currentSlide > 0) setCurrentSlide(currentSlide - 1);
+    if (currentSlide > 0) {
+      setCurrentSlide(currentSlide - 1);
+      setIsQuizActive(false);
+      setLiveScore(0);
+    }
   };
 
   return (
@@ -65,8 +102,8 @@ export default function AppIndex() {
         <Header 
           currentSlide={currentSlide} 
           totalSlides={totalSlides} 
-          points={points} 
-          title={isQuizActive ? 'QUIZ KELAS SENI 🎯' : 'ART CLASS 🎨'}
+          points={isQuizActive ? liveScore : points} 
+          title={isQuizActive ? '◀ KEMBALI' : 'ART CLASS 🎨'}
           onHomePress={handleHomePress} 
         />
       )}
@@ -75,7 +112,16 @@ export default function AppIndex() {
         {currentSlide === 0 && <Slide0_Title onStart={() => setCurrentSlide(1)} />}
         {currentSlide === 1 && <Slide1_Map />}
         {currentSlide === 2 && <Slide2_Quest />}
-        {currentSlide === 3 && <Slide3_Menu onQuizActiveChange={setIsQuizActive} />}
+        {currentSlide === 3 && (
+          <Slide3_Menu 
+            isQuizActive={isQuizActive}
+            onQuizActiveChange={(active) => {
+              setIsQuizActive(active);
+              if (!active) setLiveScore(0);
+            }} 
+            onQuizScoreChange={setLiveScore} 
+          />
+        )}
       </View>
 
       {/* Bottom Navigation Bar */}

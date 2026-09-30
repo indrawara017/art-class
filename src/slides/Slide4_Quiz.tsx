@@ -115,9 +115,10 @@ const QUIZ_QUESTIONS = [
 
 interface Slide4QuizProps {
   onFinish: (score: number) => void;
+  onScoreChange?: (score: number) => void;
 }
 
-export function Slide4_Quiz({ onFinish }: Slide4QuizProps) {
+export function Slide4_Quiz({ onFinish, onScoreChange }: Slide4QuizProps) {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const isMobile = width < 600;
@@ -126,6 +127,7 @@ export function Slide4_Quiz({ onFinish }: Slide4QuizProps) {
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const [timeLeft, setTimeLeft] = useState(30);
   const scoreRef = React.useRef(0);
 
   const pointsPerQuestion = Math.round(100 / QUIZ_QUESTIONS.length);
@@ -138,19 +140,37 @@ export function Slide4_Quiz({ onFinish }: Slide4QuizProps) {
     };
   }, []);
 
+  useEffect(() => {
+    if (isFinished || selectedOption !== null) return;
+
+    if (timeLeft === 0) {
+      handleAnswer(-1); // Timeout
+      return;
+    }
+
+    const timerId = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [timeLeft, isFinished, selectedOption]);
+
   const handleAnswer = (index: number) => {
     if (selectedOption !== null) return; // Prevent multiple clicks
 
     setSelectedOption(index);
-    const isCorrect = index === QUIZ_QUESTIONS[currentIndex].correctAnswer;
-    
-    if (isCorrect) {
-      scoreRef.current += pointsPerQuestion;
-      setScore(scoreRef.current);
+    if (index !== -1) {
+      const isCorrect = index === QUIZ_QUESTIONS[currentIndex].correctAnswer;
+      if (isCorrect) {
+        scoreRef.current += pointsPerQuestion;
+        setScore(scoreRef.current);
+        onScoreChange?.(scoreRef.current);
+      }
     }
 
     setTimeout(() => {
       setSelectedOption(null);
+      setTimeLeft(30);
       if (currentIndex < QUIZ_QUESTIONS.length - 1) {
         setCurrentIndex(prev => prev + 1);
       } else {
@@ -190,7 +210,7 @@ export function Slide4_Quiz({ onFinish }: Slide4QuizProps) {
                 onPress={() => {
                   audioManager.returnToMainSong();
                   onFinish(score);
-                  router.push('/gallery?tab=leaderboard');
+                  router.push('/leaderboard');
                 }} 
                 style={styles.btn}
               >
@@ -223,9 +243,16 @@ export function Slide4_Quiz({ onFinish }: Slide4QuizProps) {
     >
       <Animated.View key={currentIndex} entering={SlideInRight.duration(400)} style={styles.content}>
         <PixelCard backgroundColor={Colors.white} style={styles.questionCard}>
-          <Typography variant="pixel" color={Colors.blue} style={isMobile ? styles.qCountMobile : styles.qCount}>
-            SOAL {currentIndex + 1} / {QUIZ_QUESTIONS.length}
-          </Typography>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Typography variant="pixel" color={Colors.blue} style={isMobile ? styles.qCountMobile : styles.qCount}>
+              SOAL {currentIndex + 1} / {QUIZ_QUESTIONS.length}
+            </Typography>
+            <View style={{ flexDirection: 'row', gap: 16 }}>
+              <Typography variant="pixel" color={timeLeft <= 5 ? Colors.red : Colors.ink} style={isMobile ? styles.qCountMobile : styles.qCount}>
+                ⏱️ {timeLeft} detik
+              </Typography>
+            </View>
+          </View>
           <Typography style={isMobile ? styles.qTextMobile : styles.qText}>
             {currentQ.question}
           </Typography>

@@ -40,14 +40,14 @@ import {
   updateUserAvatar,
 } from '../utils/supabase';
 
-export default function GalleryScreen() {
+export default function LeaderboardScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const isMobile = width < 600;
   const { tab } = useLocalSearchParams<{ tab?: string }>();
 
-  // Hardcode activeTab to artworks since leaderboard is split
-  const activeTab: string = 'artworks';
+  // Hardcode activeTab to leaderboard since it's split
+  const activeTab: string = 'leaderboard';
 
   // User State
   const [currentUser, setCurrentUser] = useState<Profile | null>(null);
@@ -75,9 +75,6 @@ export default function GalleryScreen() {
   const [uploadImageUri, setUploadImageUri] = useState<string | null>(null);
   const [uploadImageName, setUploadImageName] = useState<string>('');
   const [uploadLoading, setUploadLoading] = useState(false);
-
-  // Full Screen Image State
-  const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
 
   const loadUser = React.useCallback(async () => {
     setIsLoadingUser(true);
@@ -323,7 +320,7 @@ export default function GalleryScreen() {
         </PixelButton>
 
         <Typography variant="pixel" color={Colors.ink} style={isMobile ? styles.headerTitleMobile : styles.headerTitle}>
-          RUANG KARYA 🎨
+          SKOR KELAS 🏆
         </Typography>
 
         {isLoadingUser ? (
@@ -411,11 +408,10 @@ export default function GalleryScreen() {
                 </Typography>
               </PixelCard>
             ) : (
-              <View style={styles.catalogContainer}>
-                {artworks.map((art, index) => {
-                  const isOwner = currentUser && (currentUser.id === art.user_id || currentUser.username === art.author_name);
+              artworks.map((art, index) => {
+                const isOwner = currentUser && (currentUser.id === art.user_id || currentUser.username === art.author_name);
                 return (
-                  <Animated.View key={art.id} entering={FadeInUp.delay(index * 60).duration(400)} style={[styles.catalogItem, isMobile && { width: '100%' }]}>
+                  <Animated.View key={art.id} entering={FadeInUp.delay(index * 60).duration(400)}>
                     <PixelCard backgroundColor={Colors.white} style={styles.artCard}>
                       <View style={styles.artCardHeader}>
                         <View style={styles.artMetaLeft}>
@@ -440,9 +436,7 @@ export default function GalleryScreen() {
                       </Typography>
 
                       {art.artwork_url ? (
-                        <TouchableOpacity activeOpacity={0.8} onPress={() => setFullScreenImage(art.artwork_url!)}>
-                          <Image source={{ uri: art.artwork_url }} style={styles.artworkImage} />
-                        </TouchableOpacity>
+                        <Image source={{ uri: art.artwork_url }} style={styles.artworkImage} />
                       ) : null}
 
                       {art.notes ? (
@@ -470,8 +464,7 @@ export default function GalleryScreen() {
                     </PixelCard>
                   </Animated.View>
                 );
-              })}
-              </View>
+              })
             )}
           </Animated.View>
         ) : (
@@ -601,17 +594,7 @@ export default function GalleryScreen() {
         </View>
       </Modal>
 
-      <Modal visible={!!fullScreenImage} transparent animationType="fade" onRequestClose={() => setFullScreenImage(null)}>
-        <View style={styles.fullScreenOverlay}>
-          <TouchableOpacity style={styles.fullScreenCloseBtn} onPress={() => setFullScreenImage(null)}>
-            <Typography style={styles.fullScreenCloseText}>✕ TUTUP</Typography>
-          </TouchableOpacity>
-          {fullScreenImage && (
-            <Image source={{ uri: fullScreenImage }} style={styles.fullScreenImage} resizeMode="contain" />
-          )}
-        </View>
-      </Modal>
-
+      {/* AUTH MODAL (LOGIN / DAFTAR) */}
       <Modal visible={showAuthModal} transparent animationType="fade" onRequestClose={() => setShowAuthModal(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -625,6 +608,7 @@ export default function GalleryScreen() {
                   : 'Buat nama pengguna tanpa repot verifikasi email!'}
               </Typography>
 
+              {/* Mode Switcher */}
               <View style={styles.authModeSwitcher}>
                 <TouchableOpacity
                   style={[styles.authModeBtn, authMode === 'login' && styles.authModeBtnActive]}
@@ -652,10 +636,11 @@ export default function GalleryScreen() {
                 </View>
               )}
 
+              {/* Inputs */}
               <Typography weight="bold" style={styles.inputLabel}>Username:</Typography>
               <TextInput
                 style={styles.pixelInput}
-                placeholder="zara_azalia"
+                placeholder="contoh: budi_seniman"
                 placeholderTextColor="#999"
                 value={usernameInput}
                 onChangeText={setUsernameInput}
@@ -982,48 +967,6 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     marginBottom: 8,
   },
-  catalogContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    width: '100%',
-  },
-  catalogItem: {
-    width: '48%',
-    marginBottom: 16,
-  },
-  artworkImage: {
-    width: '100%',
-    height: 150,
-    backgroundColor: Colors.sky,
-    borderWidth: 2,
-    borderColor: Colors.ink,
-    marginBottom: 8,
-  },
-  fullScreenOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.9)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  fullScreenImage: {
-    width: '90%',
-    height: '80%',
-  },
-  fullScreenCloseBtn: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    padding: 10,
-    zIndex: 10,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 20,
-  },
-  fullScreenCloseText: {
-    color: Colors.white,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
   artNotes: {
     fontSize: 14,
     lineHeight: 20,
@@ -1253,7 +1196,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
-
+  artworkImage: {
+    width: '100%',
+    height: 250,
+    resizeMode: 'cover',
+    borderWidth: 2,
+    borderColor: Colors.ink,
+    marginVertical: 12,
+  },
   likeBtn: {
     flexDirection: 'row',
     alignItems: 'center',

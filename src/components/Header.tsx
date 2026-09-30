@@ -18,7 +18,6 @@ interface HeaderProps {
 
 export function Header({
   currentSlide,
-  totalSlides,
   points,
   title,
   onHomePress,
